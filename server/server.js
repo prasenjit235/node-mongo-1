@@ -32,9 +32,15 @@ app.post('/user/login', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
 
   User.findByCredentials(body.email, body.password).then((user) => {
-    return user.generateAuthToken().then((token) => {
-      res.header('x-auth', token).send(user);
-    });
+    var tokensObject = user.getTokens();
+    if (tokensObject.tokens.length) {
+      console.log('already token exists!!');
+      return res.header('x-auth', tokensObject.tokens[0].token).send(user);
+    } else {
+      return user.generateAuthToken().then((token) => {
+        res.header('x-auth', token).send(user);
+      });
+    }
   }).catch((e) => {
     res.status(400).send();
   });

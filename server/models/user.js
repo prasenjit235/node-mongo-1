@@ -74,22 +74,29 @@ UserSchema.methods.removeToken = function (token) {
   });
 };
 
-// UserSchema.statics.findByToken = function (token) {
-//   var User = this;
-//   var decoded;
-//
-//   try {
-//     decoded = jwt.verify(token, 'abc123');
-//   } catch (e) {
-//     return Promise.reject();
-//   }
-//
-//   return User.findOne({
-//     '_id': decoded._id,
-//     'tokens.token': token,
-//     'tokens.access': 'auth'
-//   });
-// };
+UserSchema.methods.getTokens = function () {
+  var user = this;
+  var userObject = user.toObject();
+  console.log(JSON.stringify(userObject, undefined, 2));
+  return _.pick(userObject, ['tokens']);
+}
+
+UserSchema.statics.findByToken = function (token) {
+  var User = this;
+  var decoded;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (e) {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
 
 UserSchema.statics.findByCredentials = function (email, password) {
   var User = this;
